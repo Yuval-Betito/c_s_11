@@ -98,3 +98,6 @@ DEFAULT_FROM_EMAIL = 'no-reply@communication_ltd.com'  # כתובת המייל �
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# הוספת הנתיב של קובץ הקונפיגורציה לניהול סיסמאות
+PASSWORD_CONFIG_PATH = BASE_DIR / 'password_config.json'
+
