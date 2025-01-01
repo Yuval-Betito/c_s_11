@@ -14,6 +14,10 @@ import re
 from django.core.mail import send_mail
 from django.conf import settings
 
+# קריאת המילון החיצוני
+with open('data/wordlist.txt', 'r') as f:
+    common_passwords = set(line.strip().lower() for line in f.readlines())
+
 # פונקציה לשליחת המייל עם הטוקן
 def send_reset_email(user):
     """Send reset email with the generated token."""
@@ -22,14 +26,12 @@ def send_reset_email(user):
     message = f"Use the following token to reset your password: {token}"
     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
-
 def user_login(request):
     """Handle user login"""
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # Find the user by username
         try:
             user = User.objects.get(username=username)
             # If login attempts exceed max allowed, lock account or show message
@@ -54,12 +56,19 @@ def user_login(request):
             
     return render(request, 'users/login.html')
 
-
 def register(request):
     """Handle user registration"""
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
+            password = form.cleaned_data['password']
+            
+            # Check if the password is common or invalid
+            if password in common_passwords:  # common_passwords is the set of common passwords
+                messages.error(request, "Password cannot be a common password.")
+                return render(request, 'users/register.html', {'form': form})
+
+            # Continue with registration if password is valid
             form.save()
             messages.success(request, "Registration successful. Please log in.")
             return redirect('login')
@@ -70,12 +79,10 @@ def register(request):
 
     return render(request, 'users/register.html', {'form': form})
 
-
 @login_required
 def home(request):
     """Render the home page"""
     return render(request, 'users/home.html')
-
 
 class CustomPasswordChangeView(PasswordChangeView):
     """Custom view for handling password change"""
@@ -89,12 +96,10 @@ class CustomPasswordChangeView(PasswordChangeView):
         messages.success(self.request, "Your password was changed successfully.")
         return response
 
-
 @login_required
 def password_change_done(request):
     """Display password change success message"""
     return render(request, 'users/password_change_done.html')
-
 
 @login_required
 def create_customer(request):
@@ -111,7 +116,6 @@ def create_customer(request):
         form = CustomerForm()
 
     return render(request, 'users/create_customer.html', {'form': form})
-
 
 def forgot_password(request):
     """Handle forgot password functionality"""
@@ -133,7 +137,6 @@ def forgot_password(request):
             messages.error(request, "No user found with this email.")
     return render(request, 'users/forgot_password.html')
 
-
 def validate_password(password):
     """Check if the password meets the requirements."""
     if len(password) < 10:
@@ -147,7 +150,6 @@ def validate_password(password):
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):  # Special character
         return False
     return True
-
 
 def reset_password(request):
     """Handle reset password functionality"""
