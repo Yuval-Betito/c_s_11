@@ -64,7 +64,7 @@ def register(request):
             password = form.cleaned_data['password']
             
             # Check if the password is common or invalid
-            if password in common_passwords:  # common_passwords is the set of common passwords
+            if password.lower() in common_passwords:  # common_passwords is the set of common passwords
                 messages.error(request, "Password cannot be a common password.")
                 return render(request, 'users/register.html', {'form': form})
 
@@ -169,4 +169,3 @@ def reset_password(request):
         except User.DoesNotExist:
             messages.error(request, "Invalid reset token.")
     return render(request, 'users/reset_password.html')
-
