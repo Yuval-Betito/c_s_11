@@ -9,11 +9,15 @@ Login
 
     <!-- הצגת הודעות מערכת -->
     {% if messages %}
-        <ul style="color: red; list-style-type: none;">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
+        <div class="messages" style="max-width: 400px; margin: 0 auto; padding: 10px;">
+            <ul style="color: red; list-style-type: none; padding: 0;">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}" style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %}; margin: 10px 0; font-weight: bold;">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
 
     <form method="post" style="max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
