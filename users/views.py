@@ -1,3 +1,5 @@
+import json
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as django_login
 from django.contrib.auth.forms import PasswordChangeForm
@@ -12,7 +14,10 @@ import hashlib
 import random
 import re
 from django.core.mail import send_mail
-from django.conf import settings
+
+# קריאת הגדרות הקונפיגורציה מקובץ JSON
+with open(settings.BASE_DIR / 'password_config.json', 'r') as f:
+    config = json.load(f)
 
 # קריאת המילון החיצוני
 with open('data/wordlist.txt', 'r') as f:
@@ -169,3 +174,4 @@ def reset_password(request):
         except User.DoesNotExist:
             messages.error(request, "Invalid reset token.")
     return render(request, 'users/reset_password.html')
+
