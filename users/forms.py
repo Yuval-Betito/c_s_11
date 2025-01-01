@@ -11,16 +11,16 @@ def validate_password_with_config(password):
     with open(settings.BASE_DIR / 'password_config.json', 'r') as f:
         config = json.load(f)
 
-    # בדיקות על בסיס קובץ התצורה
-    if len(password) < config['min_length']:
-        raise ValidationError(f"Password must be at least {config['min_length']} characters long.")
-    if config['require_uppercase'] and not re.search(r'[A-Z]', password):
+      # בדיקות על בסיס קובץ התצורה
+    if len(password) < config['min_password_length']:
+        raise ValidationError(f"Password must be at least {config['min_password_length']} characters long.")
+    if config['password_requirements']['uppercase'] and not re.search(r'[A-Z]', password):
         raise ValidationError("Password must contain at least one uppercase letter.")
-    if config['require_lowercase'] and not re.search(r'[a-z]', password):
+    if config['password_requirements']['lowercase'] and not re.search(r'[a-z]', password):
         raise ValidationError("Password must contain at least one lowercase letter.")
-    if config['require_digit'] and not re.search(r'\d', password):
+    if config['password_requirements']['digits'] and not re.search(r'\d', password):
         raise ValidationError("Password must contain at least one digit.")
-    if config['require_special'] and not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+    if config['password_requirements']['special_characters'] and not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
         raise ValidationError("Password must contain at least one special character.")
 
 # טופס רישום משתמש
