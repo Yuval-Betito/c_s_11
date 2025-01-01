@@ -35,6 +35,11 @@ class RegisterForm(forms.ModelForm):
     def clean_password(self):
         password = self.cleaned_data.get('password')
         validate_password_with_config(password)  # בדיקת הסיסמה
+        # בנוסף, נוודא שהסיסמה לא נמצאת במילון סיסמאות נפוצות
+        with open(settings.BASE_DIR / 'data/wordlist.txt', 'r') as f:
+            common_passwords = set(line.strip().lower() for line in f.readlines())
+            if password.lower() in common_passwords:
+                raise ValidationError("Password cannot be a common password.")
         return password
 
     def clean(self):
