@@ -39,6 +39,7 @@ def user_login(request):
 
         try:
             user = User.objects.get(username=username)
+            
             # If login attempts exceed max allowed, lock account or show message
             if user.login_attempts >= config["max_login_attempts"]:
                 messages.error(request, "Your account is locked due to too many failed login attempts.")
@@ -53,7 +54,8 @@ def user_login(request):
                 messages.success(request, "Logged in successfully!")
                 return redirect('home')
             else:
-                user.login_attempts += 1  # Increment login attempts on failure
+                # Increment login attempts on failure
+                user.login_attempts += 1
                 user.save()
                 messages.error(request, "Invalid username or password. Please try again.")
         except User.DoesNotExist:
