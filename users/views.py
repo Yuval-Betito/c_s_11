@@ -174,4 +174,3 @@ def reset_password(request):
         except User.DoesNotExist:
             messages.error(request, "Invalid reset token.")
     return render(request, 'users/reset_password.html')
-
