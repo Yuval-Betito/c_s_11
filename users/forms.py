@@ -11,7 +11,7 @@ def validate_password_with_config(password):
     with open(settings.BASE_DIR / 'password_config.json', 'r') as f:
         config = json.load(f)
 
-      # בדיקות על בסיס קובץ התצורה
+    # בדיקות על בסיס קובץ התצורה
     if len(password) < config['min_password_length']:
         raise ValidationError(f"Password must be at least {config['min_password_length']} characters long.")
     if config['password_requirements']['uppercase'] and not re.search(r'[A-Z]', password):
@@ -48,7 +48,7 @@ class RegisterForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         password = self.cleaned_data.get('password')
-        user.set_password(password)  # הצפנת הסיסמה
+        user.set_password(password)  # הצפנת הסיסמה עם set_password
         if commit:
             user.save()
         return user
@@ -88,3 +88,4 @@ class CustomerForm(forms.ModelForm):
         if commit:
             customer.save()
         return customer
+
