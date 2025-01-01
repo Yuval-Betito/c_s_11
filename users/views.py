@@ -37,10 +37,11 @@ def user_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        try:
-            user = User.objects.get(username=username)
-            
-            # If login attempts exceed max allowed, lock account or show message
+        # Attempt to get the user
+        user = User.objects.filter(username=username).first()
+
+        if user:
+            # Check if login attempts exceed max allowed, lock account or show message
             if user.login_attempts >= config["max_login_attempts"]:
                 messages.error(request, "Your account is locked due to too many failed login attempts.")
                 return render(request, 'users/login.html')
@@ -58,9 +59,9 @@ def user_login(request):
                 user.login_attempts += 1
                 user.save()
                 messages.error(request, "Invalid username or password. Please try again.")
-        except User.DoesNotExist:
-            messages.error(request, "User does not exist.")
-            
+        else:
+            messages.error(request, "Invalid username or password. Please try again.")
+
     return render(request, 'users/login.html')
 
 def register(request):
