@@ -29,13 +29,29 @@ def user_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            django_login(request, user)
-            messages.success(request, "Logged in successfully!")
-            return redirect('home')
-        else:
-            messages.error(request, "Invalid username or password. Please try again.")
+        # Find the user by username
+        try:
+            user = User.objects.get(username=username)
+            # If login attempts exceed max allowed, lock account or show message
+            if user.login_attempts >= config["max_login_attempts"]:
+                messages.error(request, "Your account is locked due to too many failed login attempts.")
+                return render(request, 'users/login.html')
+
+            # Authenticate user
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                django_login(request, user)
+                user.login_attempts = 0  # Reset the login attempts after successful login
+                user.save()
+                messages.success(request, "Logged in successfully!")
+                return redirect('home')
+            else:
+                user.login_attempts += 1  # Increment login attempts on failure
+                user.save()
+                messages.error(request, "Invalid username or password. Please try again.")
+        except User.DoesNotExist:
+            messages.error(request, "User does not exist.")
+            
     return render(request, 'users/login.html')
 
 
@@ -151,3 +167,4 @@ def reset_password(request):
         except User.DoesNotExist:
             messages.error(request, "Invalid reset token.")
     return render(request, 'users/reset_password.html')
+
