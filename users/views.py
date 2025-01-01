@@ -8,7 +8,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm, CustomerForm
 from .models import User
-from .models import config
 import hashlib
 import random
 import re
