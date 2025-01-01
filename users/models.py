@@ -44,6 +44,7 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     reset_token = models.CharField(max_length=100, blank=True, null=True)  # Token for password reset
     password_history = models.JSONField(default=list)  # שדה לשמירת היסטוריית סיסמאות
+    login_attempts = models.IntegerField(default=0)  # שדה לניסיונות כניסה
 
     objects = UserManager()
 
@@ -125,4 +126,3 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.firstname} {self.lastname}"
-
