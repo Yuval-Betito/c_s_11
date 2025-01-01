@@ -12,6 +12,9 @@ from django.core.validators import RegexValidator
 with open('password_config.json') as f:
     config = json.load(f)
 
+# קריאת המילון החיצוני
+with open('data/wordlist.txt', 'r') as f:
+    common_passwords = set(line.strip().lower() for line in f.readlines())
 
 class UserManager(BaseUserManager):
     """Custom manager for User model."""
@@ -96,9 +99,8 @@ class User(AbstractBaseUser):
 
         # אם נדרש מניעת מילים מתוך מילון, נוכל לבדוק את הסיסמה במילון (תוכנית חיצונית או רשימה מוגדרת)
         if config["dictionary_check"]:
-            # לדוגמה, נוודא שהסיסמה לא כוללת את המילים השכיחות ביותר:
-            common_passwords = ["123456", "password", "qwerty"]  # דוגמה
-            if password in common_passwords:
+            password_lower = password.lower()  # Convert the password to lowercase for case-insensitive comparison
+            if password_lower in common_passwords:
                 raise ValidationError("Password cannot be a common password.")
         
     def __str__(self):
@@ -123,3 +125,4 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.firstname} {self.lastname}"
+
