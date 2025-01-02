@@ -10,10 +10,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm, CustomerForm
 from .models import User
-import random
 import hashlib
+import random
+import re
 from django.core.mail import send_mail
-from django.contrib.auth.hashers import make_password, check_password
 
 # קריאת הגדרות הקונפיגורציה מקובץ JSON
 with open(settings.BASE_DIR / 'password_config.json', 'r') as f:
@@ -177,4 +177,3 @@ def reset_password(request):
         except User.DoesNotExist:
             messages.error(request, "Invalid reset token.")
     return render(request, 'users/reset_password.html')
-
