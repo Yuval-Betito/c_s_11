@@ -107,5 +107,26 @@ DEFAULT_FROM_EMAIL = 'communication.ltd001@gmail.com'  # כתובת השולח �
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# הגדרת לוגים
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',  # או ERROR אם תרצה שיבוצע רק רישום של שגיאות
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs/django.log',  # שם הקובץ שיישמר
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',  # רמת הלוג, תוכל לשנות אם תרצה שירשום רמות אחרות
+            'propagate': True,
+        },
+    },
+}
+
+
 # הוספת הנתיב של קובץ הקונפיגורציה לניהול סיסמאות
 PASSWORD_CONFIG_PATH = BASE_DIR / 'password_config.json'
