@@ -1,5 +1,6 @@
 import hashlib
 import secrets  # השתמש ב-secrets כדי ליצור ערך אקראי
+import re  # ייבוא מודול regex לצורך החיפושים
 from django.core.mail import send_mail
 from django.conf import settings
 from django.shortcuts import render, redirect
@@ -60,14 +61,13 @@ def reset_password(request):
 def validate_password(password):
     """Check if the password meets the requirements."""
     if len(password) < 10:
-        return False
+        raise ValidationError("Password must be at least 10 characters long.")
     if not re.search(r'[A-Z]', password):  # Uppercase letter
-        return False
+        raise ValidationError("Password must contain at least one uppercase letter.")
     if not re.search(r'[a-z]', password):  # Lowercase letter
-        return False
+        raise ValidationError("Password must contain at least one lowercase letter.")
     if not re.search(r'[0-9]', password):  # Digit
-        return False
+        raise ValidationError("Password must contain at least one digit.")
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):  # Special character
-        return False
-    return True
-
+        raise ValidationError("Password must contain at least one special character.")
+    return True  # If the password passes all checks, return True
