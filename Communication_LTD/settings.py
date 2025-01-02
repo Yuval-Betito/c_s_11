@@ -2,7 +2,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-gl=b&u71jf7ix(s^b^+y8^!eiubw&i43$r+l%)yhw#!fju)(p@"  # יש לשמור את המפתח במקום בטוח
+SECRET_KEY = "django-insecure-gl=b&u71jf7ix(s^b^+y8^!eiubw&i43$r+l%)yhw#!fju)(p@"
 
 DEBUG = True
 
@@ -93,18 +93,11 @@ LOGIN_URL = '/login/'
 # נתיב לדף הבית לאחר התחברות
 LOGIN_REDIRECT_URL = '/'  # דף הבית לאחר התחברות
 
-# הגדרות מייל לשליחת טוקנים
+# הוספת מייל לשליחת טוקנים
 DEFAULT_FROM_EMAIL = 'no-reply@communication_ltd.com'  # כתובת המייל לשליחת טוקנים
-
-# הגדרות SMTP (לשליחה דרך Gmail או שרת SMTP אחר)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # עבור Gmail
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@gmail.com'  # כתובת המייל שלך
-EMAIL_HOST_PASSWORD = 'your-email-password'  # הסיסמה של המייל שלך
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # הוספת הנתיב של קובץ הקונפיגורציה לניהול סיסמאות
-PASSWORD_CONFIG_PATH = BASE_DIR / 'password_config.json'  # נתיב לקובץ הקונפיגורציה של ניהול סיסמאות
+PASSWORD_CONFIG_PATH = BASE_DIR / 'password_config.json'
+
