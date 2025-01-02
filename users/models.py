@@ -7,6 +7,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.contrib.auth.hashers import make_password, check_password
 
 # קריאת הגדרות הקונפיגורציה מקובץ JSON
 with open('password_config.json') as f:
@@ -35,7 +36,6 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
 class User(AbstractBaseUser):
     """Custom User model with HMAC + Salt for password handling."""
     username = models.CharField(max_length=50, unique=True)
@@ -43,8 +43,8 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     reset_token = models.CharField(max_length=100, blank=True, null=True)  # Token for password reset
-    password_history = models.JSONField(default=list)  # שדה לשמירת היסטוריית סיסמאות
-    login_attempts = models.IntegerField(default=0)  # שדה לניסיונות כניסה
+    password_history = models.JSONField(default=list)  # Store password history
+    login_attempts = models.IntegerField(default=0)  # Login attempt field
 
     objects = UserManager()
 
@@ -52,34 +52,27 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['email']
 
     def set_password(self, raw_password):
-        """Override set_password to use HMAC + Salt and update password history."""
+        """Override set_password to use hashed password with password history."""
         if raw_password:
             # Validate password strength according to requirements
             self.validate_password_strength(raw_password)
 
-            salt = os.urandom(16).hex()  # Generate a random Salt
-            hashed_password = hmac.new(salt.encode(), raw_password.encode(), hashlib.sha256).hexdigest()
-            new_password = f'{salt}${hashed_password}'  # Save salt and hash in the format: salt$hashed_password
-            
+            hashed_password = make_password(raw_password)  # Use Django's built-in password hashing
+
             # Check if the new password matches the recent password history
-            if any(hmac.compare_digest(old.split('$')[1], hashed_password) for old in self.password_history[-config["password_history"]:]):
+            if any(check_password(raw_password, old) for old in self.password_history[-config["password_history"]:]):
                 raise ValueError("Password cannot match the last 3 passwords.")
             
             # Update password and history
-            self.password = new_password
-            self.password_history.append(new_password)
+            self.password = hashed_password
+            self.password_history.append(hashed_password)
             self.password_history = self.password_history[-config["password_history"]:]
 
     def check_password(self, raw_password):
         """Verify the user's password."""
         if not self.password:
             return False
-        try:
-            salt, stored_hash = self.password.split('$')
-            entered_hash = hmac.new(salt.encode(), raw_password.encode(), hashlib.sha256).hexdigest()
-            return stored_hash == entered_hash
-        except ValueError:
-            return False
+        return check_password(raw_password, self.password)
 
     def validate_password_strength(self, password):
         """Ensure password meets all strength requirements."""
@@ -112,7 +105,6 @@ class User(AbstractBaseUser):
         """Check if the user has admin privileges."""
         return self.is_admin
 
-
 class Customer(models.Model):
     """Model for storing customer details."""
     firstname = models.CharField(max_length=50)
@@ -126,4 +118,5 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.firstname} {self.lastname}"
+
 
