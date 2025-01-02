@@ -1,3 +1,5 @@
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import json
 from django.conf import settings
 from django.shortcuts import render, redirect
@@ -9,11 +11,11 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm, CustomerForm
-from .models import User
 import random
 import hashlib
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password, check_password
+import re
 
 # קריאת הגדרות הקונפיגורציה מקובץ JSON
 with open(settings.BASE_DIR / 'password_config.json', 'r') as f:
@@ -23,7 +25,96 @@ with open(settings.BASE_DIR / 'password_config.json', 'r') as f:
 with open('data/wordlist.txt', 'r') as f:
     common_passwords = set(line.strip().lower() for line in f.readlines())
 
-# פונקציה לשליחת המייל עם הטוקן
+# UserManager for creating and managing users
+class UserManager(BaseUserManager):
+    def create_user(self, username, email, password=None):
+        if not email:
+            raise ValueError("Users must have an email address.")
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email)
+        if password:
+            user.set_password(password)  # Use the customized password hashing
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, email, password):
+        """Create a superuser with admin privileges."""
+        user = self.create_user(username, email, password)
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+# User model using custom manager
+class User(AbstractBaseUser):
+    username = models.CharField(max_length=50, unique=True)
+    email = models.EmailField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    reset_token = models.CharField(max_length=100, blank=True, null=True)  # Token for password reset
+    password_history = models.JSONField(default=list)  # Store password history
+    login_attempts = models.IntegerField(default=0)  # Login attempt field
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    def set_password(self, raw_password):
+        """Override set_password to use hashed password with password history."""
+        if raw_password:
+            # Validate password strength according to requirements
+            self.validate_password_strength(raw_password)
+
+            # Generate the hashed password
+            hashed_password = make_password(raw_password)  # Use Django's built-in password hashing
+
+            # Check if the new password matches the recent password history
+            if any(check_password(raw_password, old) for old in self.password_history[-config["password_history"]:]):
+                raise ValueError("Password cannot match the last 3 passwords.")
+            
+            # Update password and history
+            self.password = hashed_password
+            self.password_history.append(hashed_password)
+            self.password_history = self.password_history[-config["password_history"]:]
+
+    def check_password(self, raw_password):
+        """Verify the user's password."""
+        if not self.password:
+            return False
+        return check_password(raw_password, self.password)
+
+    def validate_password_strength(self, password):
+        """Ensure password meets all strength requirements."""
+        if len(password) < config["min_password_length"]:
+            raise ValidationError(f"Password must be at least {config['min_password_length']} characters long.")
+        
+        if config["password_requirements"]["uppercase"] and not any(c.isupper() for c in password):
+            raise ValidationError("Password must contain at least one uppercase letter.")
+        
+        if config["password_requirements"]["lowercase"] and not any(c.islower() for c in password):
+            raise ValidationError("Password must contain at least one lowercase letter.")
+        
+        if config["password_requirements"]["digits"] and not any(c.isdigit() for c in password):
+            raise ValidationError("Password must contain at least one digit.")
+        
+        if config["password_requirements"]["special_characters"] and not any(c in "!@#$%^&*(),.?\":{}|<>" for c in password):
+            raise ValidationError("Password must contain at least one special character.")
+
+        # If dictionary check is enabled, prevent common passwords
+        if config["dictionary_check"]:
+            password_lower = password.lower()  # Convert the password to lowercase for case-insensitive comparison
+            if password_lower in common_passwords:
+                raise ValidationError("Password cannot be a common password.")
+
+    def __str__(self):
+        return self.username
+
+    @property
+    def is_staff(self):
+        """Check if the user has admin privileges."""
+        return self.is_admin
+
+# Login, registration, and password reset views (same as before)
 def send_reset_email(user):
     """Send reset email with the generated token."""
     token = user.reset_token
@@ -177,3 +268,4 @@ def reset_password(request):
         except User.DoesNotExist:
             messages.error(request, "Invalid reset token.")
     return render(request, 'users/reset_password.html')
+
