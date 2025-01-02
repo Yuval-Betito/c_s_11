@@ -113,7 +113,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'file': {
-            'level': 'DEBUG',  # או ERROR אם תרצה שיבוצע רק רישום של שגיאות
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'logs/django.log',  # שם הקובץ שיישמר
         },
@@ -127,6 +127,6 @@ LOGGING = {
     },
 }
 
-
 # הוספת הנתיב של קובץ הקונפיגורציה לניהול סיסמאות
 PASSWORD_CONFIG_PATH = BASE_DIR / 'password_config.json'
+
