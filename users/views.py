@@ -166,16 +166,19 @@ def reset_password(request):
         token = request.POST.get('token')
         new_password = request.POST.get('new_password')
         try:
+            # חיפוש המשתמש לפי הטוקן
             user = User.objects.get(reset_token=token)
+            # אם הסיסמה עומדת בדרישות
             if validate_password(new_password):
-                user.set_password(new_password)
-                user.reset_token = None  # Clear the reset token
+                user.set_password(new_password)  # עדכון הסיסמה
+                user.reset_token = None  # נקה את הטוקן
                 user.save()
                 messages.success(request, "Password reset successfully.")
                 return redirect('login')
             else:
                 messages.error(request, "Password does not meet the requirements.")
         except User.DoesNotExist:
-            messages.error(request, "Invalid reset token.")
+            messages.error(request, "Invalid reset token.")  # טוקן לא נמצא
     return render(request, 'users/reset_password.html')
+
 
