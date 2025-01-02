@@ -2,7 +2,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-gl=b&u71jf7ix(s^b^+y8^!eiubw&i43$r+l%)yhw#!fju)(p@"
+SECRET_KEY = "django-insecure-gl=b&u71jf7ix(s^b^+y8^!eiubw&i43$r+l%)yhw#!fju)(p@"  # יש לשמור את המפתח במקום בטוח
 
 DEBUG = True
 
@@ -107,4 +107,4 @@ EMAIL_HOST_PASSWORD = 'your-email-password'  # הסיסמה של המייל של
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # הוספת הנתיב של קובץ הקונפיגורציה לניהול סיסמאות
-PASSWORD_CONFIG_PATH = BASE_DIR / 'password_config.json'
+PASSWORD_CONFIG_PATH = BASE_DIR / 'password_config.json'  # נתיב לקובץ הקונפיגורציה של ניהול סיסמאות
