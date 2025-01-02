@@ -57,6 +57,7 @@ class User(AbstractBaseUser):
             # Validate password strength according to requirements
             self.validate_password_strength(raw_password)
 
+            # Generate the hashed password
             hashed_password = make_password(raw_password)  # Use Django's built-in password hashing
 
             # Check if the new password matches the recent password history
@@ -91,7 +92,7 @@ class User(AbstractBaseUser):
         if config["password_requirements"]["special_characters"] and not any(c in "!@#$%^&*(),.?\":{}|<>" for c in password):
             raise ValidationError("Password must contain at least one special character.")
 
-        # אם נדרש מניעת מילים מתוך מילון, נוכל לבדוק את הסיסמה במילון (תוכנית חיצונית או רשימה מוגדרת)
+        # If dictionary check is enabled, prevent common passwords
         if config["dictionary_check"]:
             password_lower = password.lower()  # Convert the password to lowercase for case-insensitive comparison
             if password_lower in common_passwords:
