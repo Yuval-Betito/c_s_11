@@ -94,10 +94,18 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'  # דף הבית לאחר התחברות
 
 # הוספת מייל לשליחת טוקנים
-DEFAULT_FROM_EMAIL = 'no-reply@communication_ltd.com'  # כתובת המייל לשליחת טוקנים
+DEFAULT_FROM_EMAIL = 'communication.ltd001@gmail.com'  # כתובת המייל לשליחת טוקנים
+
+# הגדרות SMTP לשליחת מיילים דרך Gmail
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # שרת ה-SMTP של Gmail
+EMAIL_PORT = 587  # פורט TLS
+EMAIL_USE_TLS = True  # השתמש ב-TLS לאבטחה
+EMAIL_HOST_USER = 'communication.ltd001@gmail.com'  # כתובת המייל שלך ב-Gmail
+EMAIL_HOST_PASSWORD = 'aeao vyqk uvzy gbho'  # סיסמת האפליקציה שיצרת
+DEFAULT_FROM_EMAIL = 'communication.ltd001@gmail.com'  # כתובת השולח שתופיע במיילים
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # הוספת הנתיב של קובץ הקונפיגורציה לניהול סיסמאות
 PASSWORD_CONFIG_PATH = BASE_DIR / 'password_config.json'
-
