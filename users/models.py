@@ -16,6 +16,8 @@ import hashlib
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password, check_password
 import re
+from django.core.exceptions import ValidationError
+
 
 # קריאת הגדרות הקונפיגורציה מקובץ JSON
 with open(settings.BASE_DIR / 'password_config.json', 'r') as f:
@@ -43,6 +45,7 @@ class UserManager(BaseUserManager):
         user.is_admin = True
         user.save(using=self._db)
         return user
+
 
 # User model using custom manager
 class User(AbstractBaseUser):
@@ -113,6 +116,7 @@ class User(AbstractBaseUser):
     def is_staff(self):
         """Check if the user has admin privileges."""
         return self.is_admin
+
 
 # Login, registration, and password reset views (same as before)
 def send_reset_email(user):
@@ -268,4 +272,3 @@ def reset_password(request):
         except User.DoesNotExist:
             messages.error(request, "Invalid reset token.")
     return render(request, 'users/reset_password.html')
-
