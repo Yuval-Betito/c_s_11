@@ -102,7 +102,7 @@ EMAIL_HOST = 'smtp.gmail.com'  # שרת ה-SMTP של Gmail
 EMAIL_PORT = 587  # פורט TLS
 EMAIL_USE_TLS = True  # השתמש ב-TLS לאבטחה
 EMAIL_HOST_USER = 'communication.ltd001@gmail.com'  # כתובת המייל שלך ב-Gmail
-EMAIL_HOST_PASSWORD = 'aeao vyqk uvzy gbho'  # סיסמת האפליקציה שיצרת
+EMAIL_HOST_PASSWORD = 'stjo bulq lmjd ikvw'  # סיסמת האפליקציה שיצרת
 DEFAULT_FROM_EMAIL = 'communication.ltd001@gmail.com'  # כתובת השולח שתופיע במיילים
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
