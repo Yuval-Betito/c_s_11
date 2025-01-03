@@ -146,19 +146,29 @@ def forgot_password(request):
             messages.error(request, "No user found with this email.")
     return render(request, 'users/forgot_password.html')
 
-def validate_password(password):
+
+def validate_password(password, request):
     """Check if the password meets the requirements."""
+    is_valid = True
+    
     if len(password) < 10:
-        raise ValidationError("Password must be at least 10 characters long.")
+        messages.error(request, "Password must be at least 10 characters long.")
+        is_valid = False
     if not re.search(r'[A-Z]', password):  # Uppercase letter
-        raise ValidationError("Password must contain at least one uppercase letter.")
+        messages.error(request, "Password must contain at least one uppercase letter.")
+        is_valid = False
     if not re.search(r'[a-z]', password):  # Lowercase letter
-        raise ValidationError("Password must contain at least one lowercase letter.")
+        messages.error(request, "Password must contain at least one lowercase letter.")
+        is_valid = False
     if not re.search(r'[0-9]', password):  # Digit
-        raise ValidationError("Password must contain at least one digit.")
+        messages.error(request, "Password must contain at least one digit.")
+        is_valid = False
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):  # Special character
-        raise ValidationError("Password must contain at least one special character.")
-    return True
+        messages.error(request, "Password must contain at least one special character.")
+        is_valid = False
+        
+    return is_valid
+
 
 
 def reset_password(request):
