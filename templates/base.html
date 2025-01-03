@@ -23,6 +23,8 @@
                 {% else %}
                     <li><a href="{% url 'login' %}">Login</a></li>
                     <li><a href="{% url 'register' %}">Register</a></li>
+                    <li><a href="{% url 'forgot_password' %}">Forgot Password</a></li>
+                    <li><a href="{% url 'reset_password' %}">Reset Password</a></li> <!-- Add Reset Password link -->
                 {% endif %}
             </ul>
         </nav>
@@ -38,3 +40,4 @@
 
 </body>
 </html>
+
