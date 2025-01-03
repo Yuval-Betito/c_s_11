@@ -160,7 +160,6 @@ def validate_password(password):
         raise ValidationError("Password must contain at least one special character.")
     return True
 
-from django.contrib import messages
 
 def reset_password(request):
     """Handle reset password functionality"""
