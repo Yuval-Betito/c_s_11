@@ -160,6 +160,8 @@ def validate_password(password):
         raise ValidationError("Password must contain at least one special character.")
     return True
 
+from django.contrib import messages
+
 def reset_password(request):
     """Handle reset password functionality"""
     if request.method == 'POST':
@@ -168,15 +170,16 @@ def reset_password(request):
         try:
             # חיפוש המשתמש לפי הטוקן
             user = User.objects.get(reset_token=token)
+            
             # אם הסיסמה עומדת בדרישות
             if validate_password(new_password):
                 user.set_password(new_password)  # עדכון הסיסמה
                 user.reset_token = None  # נקה את הטוקן
                 user.save()
-                messages.success(request, "Password reset successfully.")
+                messages.success(request, "Password reset successfully.")  # הודעה בהצלחה
                 return redirect('login')
             else:
-                messages.error(request, "Password does not meet the requirements.")
+                messages.error(request, "Password does not meet the requirements.")  # הודעת שגיאה
         except User.DoesNotExist:
             messages.error(request, "Invalid reset token.")  # טוקן לא נמצא
     return render(request, 'users/reset_password.html')
